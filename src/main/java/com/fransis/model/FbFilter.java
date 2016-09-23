@@ -16,7 +16,7 @@ public class FbFilter {
     public FbFilter() {
     }
 
-    public FbFilter(Long id, String value) {
+    public FbFilter(String value) {
         this.id = id;
         this.value = value;
     }

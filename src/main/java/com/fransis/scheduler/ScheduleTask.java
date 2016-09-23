@@ -5,8 +5,12 @@
 
 package com.fransis.scheduler;
 
+import com.fransis.model.FbUsername;
+import com.fransis.model.FbGroup;
+import com.fransis.repository.UsernameRepository;
 import com.fransis.repository.FeedRepository;
 import com.fransis.repository.FilterRepository;
+import com.fransis.repository.GroupRepository;
 import com.fransis.task.AsyncTaskGetFeed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +31,20 @@ public class ScheduleTask {
     @Autowired
     private FilterRepository filterRepository;
 
+    @Autowired
+    private UsernameRepository usernameRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
+
+
     @Scheduled(fixedRate = 60000)
     public void verificar(){
 
-        AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed("1027119427344209","EAACEdEose0cBAPpIpAjNSii9qkuK3y5e1MTp1b2KkZCjTIkkZBGGyXE3rsbmB9ZCiZCq2BLZAZBNuJjdWHRjNxSAxnfOQ5zVZC73jwEQHhvW8g9XF36MXzWqiP505JvxTjjQYc66ZBL7EycstKlKFGoWaObpdGjJoNqAWkxMQ93SYAZDZD", feedRepository, filterRepository);
+        FbUsername fbUsername = usernameRepository.findOne("franciscogiana@hotmail.com");
+        FbGroup fbGroup = groupRepository.findAll().get(0);
+
+        AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, filterRepository, fbUsername, fbGroup);
         asyncTaskGetFeed.run();
         log.info("Verificando Feeds");
     }

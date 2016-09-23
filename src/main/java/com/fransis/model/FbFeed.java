@@ -14,6 +14,7 @@ public class FbFeed {
     private String message;
 
     public FbFeed() {
+
     }
 
     public FbFeed(String id, String message) {

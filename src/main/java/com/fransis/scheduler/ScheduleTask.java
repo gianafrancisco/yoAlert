@@ -5,18 +5,18 @@
 
 package com.fransis.scheduler;
 
+import com.fransis.email.EmailSender;
 import com.fransis.model.FbUsername;
-import com.fransis.model.FbGroup;
-import com.fransis.repository.UsernameRepository;
-import com.fransis.repository.FeedRepository;
-import com.fransis.repository.FilterRepository;
-import com.fransis.repository.GroupRepository;
+import com.fransis.model.Watcher;
+import com.fransis.repository.*;
 import com.fransis.task.AsyncTaskGetFeed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Created by francisco on 22/08/2016.
@@ -29,24 +29,26 @@ public class ScheduleTask {
     @Autowired
     private FeedRepository feedRepository;
     @Autowired
-    private FilterRepository filterRepository;
-
-    @Autowired
     private UsernameRepository usernameRepository;
-
     @Autowired
-    private GroupRepository groupRepository;
-
+    private EmailSender sender;
+    @Autowired
+    private WatcherRepository watcherRepository;
 
     @Scheduled(fixedRate = 60000)
     public void verificar(){
 
         FbUsername fbUsername = usernameRepository.findOne("franciscogiana@hotmail.com");
-        FbGroup fbGroup = groupRepository.findAll().get(0);
 
-        AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, filterRepository, fbUsername, fbGroup);
-        asyncTaskGetFeed.run();
-        log.info("Verificando Feeds");
+        List<Watcher> watchers = watcherRepository.findAll();
+        if(watchers.size() > 0) {
+            Watcher watcher = watchers.get(0);
+            if (fbUsername != null) {
+                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher, fbUsername);
+                asyncTaskGetFeed.run();
+                log.info("Verificando Feeds");
+            }
+        }
     }
 
 }

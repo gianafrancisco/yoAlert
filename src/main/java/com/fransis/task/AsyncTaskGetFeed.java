@@ -1,11 +1,8 @@
 package com.fransis.task;
 
-import com.fransis.email.Mailin;
-import com.fransis.model.FbFeed;
-import com.fransis.model.FbUsername;
-import com.fransis.model.FbGroup;
+import com.fransis.email.EmailSender;
+import com.fransis.model.*;
 import com.fransis.repository.FeedRepository;
-import com.fransis.repository.FilterRepository;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
@@ -18,30 +15,30 @@ import com.restfb.json.JsonObject;
  */
 public class AsyncTaskGetFeed implements Runnable{
 
-    private String groupId;
     private String accessToken;
 
     private JsonObject groupFeeds;
     private FacebookClient facebookClient;
 
     private FeedRepository feedRepository;
-    private FilterRepository filterRepository;
 
     private FbGroup fbGroup;
     private FbUsername fbUsername;
+    private Watcher watcher;
+    private EmailSender sender;
 
-    public AsyncTaskGetFeed(FeedRepository feedRepository, FilterRepository filterRepository, FbUsername fbUsername, FbGroup fbGroup) {
-        this.groupId = fbGroup.getGroupId();
+    public AsyncTaskGetFeed(FeedRepository feedRepository, EmailSender emailSender, Watcher watcher, FbUsername fbUsername) {
+        this.fbGroup = watcher.getGroups().iterator().next();
+        this.fbUsername = fbUsername;
         this.accessToken = fbUsername.getAccessToken();
         facebookClient = new DefaultFacebookClient( this.accessToken, Version.VERSION_2_7);
         this.feedRepository = feedRepository;
-        this.filterRepository = filterRepository;
-        this.fbGroup = fbGroup;
-        this.fbUsername = fbUsername;
+        this.watcher = watcher;
+        this.sender = emailSender;
     }
 
     public void run() {
-            groupFeeds = facebookClient.fetchObject("/" + groupId + "/feed", JsonObject.class, Parameter.with("fields","id,message"), Parameter.with("limit", 1000));
+            groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields","id,message,from"), Parameter.with("limit", 1000));
             JsonArray data = groupFeeds.getJsonArray("data");
             for(int i = 0; i < data.length(); i++){
                 JsonObject feed = data.getJsonObject(i);
@@ -49,18 +46,21 @@ public class AsyncTaskGetFeed implements Runnable{
                     String message = feed.getString("message");
                     System.out.println(message);
                     if(!feedRepository.exists(feed.getString("id"))){
-                        boolean m = filterRepository.findAll().stream().anyMatch(fbFilter -> {
-                            return message.contains(fbFilter.getValue());
-                        });
+                        boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> message.contains(fbFilter.getValue()));
                         if(m){
                             //Notificar
-                            feedRepository.saveAndFlush(new FbFeed(feed.getString("id"), feed.getString("message")));
+                            FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
+                            feedRepository.saveAndFlush(fbMessage);
                             System.out.println("Alerta: " + message);
-
-                            /*Mailin http = new Mailin("https://api.sendinblue.com/v2.0", "your access key", 5000);   //Optional parameter: Timeout in MS
-                            String str = http.get_account();
-                            System.out.println(str);*/
-
+                            Email dst = watcher.getEmails().iterator().next();
+                            StringBuilder html = new StringBuilder();
+                            html.append("El post id " + fbMessage.getId());
+                            html.append(" contiene el siguiente texto<br><b>");
+                            html.append(fbMessage.getMessage() + "</b><br>");
+                            html.append("El post fue realizado por <b>");
+                            JsonObject from = feed.getJsonObject("from");
+                            html.append(from.getString("name") + "</b>");
+                            sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDesc(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
                         }
                     }
                 }

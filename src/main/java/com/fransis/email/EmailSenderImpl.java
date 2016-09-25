@@ -41,6 +41,8 @@ public class EmailSenderImpl implements EmailSender {
         mapData.put("html", body);
 
         String response = http.send_email(mapData);
+        System.out.println(response);
+
         return response.contains("\"code\":\"success\"");
     }
 }

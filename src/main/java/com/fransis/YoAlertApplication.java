@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.Arrays;
+
 @SpringBootApplication
 @EnableScheduling
 @ComponentScan("com.fransis")
@@ -44,14 +46,19 @@ public class YoAlertApplication {
 			FbUsername fbUsername = new FbUsername("franciscogiana@hotmail.com", accessTokenExtended.getAccessToken());
 			fbUsername = usernameRepository.saveAndFlush(fbUsername);
 
-			FbFilter fbFilter = new FbFilter("Nueva publicacion");
-			fbFilter = filterRepository.saveAndFlush(fbFilter);
+			String filters = System.getProperty("filters", "");
 
 
 			Watcher watcher = new Watcher("NZ Group");
 			watcher.getEmails().add(email);
-			watcher.getFilters().add(fbFilter);
+			watcher.getFilters();
 			watcher.getGroups().add(fbGroup);
+
+			Arrays.stream(filters.split(",")).forEach(s -> {
+				FbFilter fbFilter = new FbFilter(s);
+				fbFilter = filterRepository.saveAndFlush(fbFilter);
+				watcher.getFilters().add(fbFilter);
+			});
 
 			watcherRepository.save(watcher);
 

@@ -6,6 +6,7 @@ import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 @EnableScheduling
 @ComponentScan("com.fransis")
 @ConfigurationProperties(locations = "classpath:application.properties")
+@EnableAutoConfiguration
 public class YoAlertApplication {
 
 	private static final String MY_APP_ID = "1334300239928512";

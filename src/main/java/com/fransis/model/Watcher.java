@@ -52,4 +52,8 @@ public class Watcher {
     public Collection<Email> getEmails() {
         return emails;
     }
+
+    public Long getId() {
+        return id;
+    }
 }

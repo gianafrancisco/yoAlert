@@ -1,0 +1,28 @@
+sudo: required
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+services:
+  - docker
+install:
+#  - cd src/main/gui/ && npm install && bower install
+#  - grunt build --force
+#  - cd ../../../
+  - mvn install -Dmaven.javadoc.skip=true -B -V
+# - mvn install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
+
+before_install:
+#  - sudo apt-get update && sudo apt-get install -y nodejs npm
+#  - npm install -g grunt grunt-cli bower
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+
+after_success:
+  - docker build -t fgiana/yoAlert:latest .
+  - docker run --name yoAlert -d -P fgiana/yoAlert:latest
+  - docker ps
+  - docker port yoAlert
+  - docker push fgiana/yoAlert:latest
+

@@ -32,6 +32,7 @@ public class YoAlertApplication {
 	@Bean
 	public CommandLineRunner loadData(GroupRepository groupRepository, EmailRepository emailRepository, UsernameRepository usernameRepository, FilterRepository filterRepository, WatcherRepository watcherRepository) {
 		return (args) -> {
+			/*
 			Email email = new Email("gianafrancisco@gmail.com", "Francisco Giana");
 			email = emailRepository.saveAndFlush(email);
 
@@ -63,7 +64,7 @@ public class YoAlertApplication {
 			});
 
 			watcherRepository.save(watcher);
-
+			*/
 		};
 	}
 

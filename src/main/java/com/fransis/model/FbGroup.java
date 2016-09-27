@@ -15,9 +15,11 @@ public class FbGroup {
     private String groupName;
 
     public FbGroup() {
+        this.id = 0L;
     }
 
     public FbGroup(String groupId, String groupName) {
+        this();
         this.groupId = groupId;
         this.groupName = groupName;
     }

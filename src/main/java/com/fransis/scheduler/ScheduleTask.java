@@ -35,17 +35,13 @@ public class ScheduleTask {
     @Autowired
     private WatcherRepository watcherRepository;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     public void verificar(){
-
-        FbUsername fbUsername = usernameRepository.findOne("franciscogiana@hotmail.com");
-
         List<Watcher> watchers = watcherRepository.findAll();
-        if(watchers.size() > 0) {
-            Watcher watcher = watchers.get(0);
-            if (fbUsername != null) {
-                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher, fbUsername);
-                asyncTaskGetFeed.run();
+        for(Watcher watcher: watchers){
+            if(watcher.getUsername() != null){
+                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher);
+                new Thread(asyncTaskGetFeed).start();
                 log.info("Verificando Feeds");
             }
         }

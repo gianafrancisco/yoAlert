@@ -1,13 +1,9 @@
 package com.fransis.controller;
 
-import com.fransis.model.Email;
-import com.fransis.model.FbFilter;
-import com.fransis.model.FbGroup;
-import com.fransis.model.Watcher;
-import com.fransis.repository.EmailRepository;
-import com.fransis.repository.FilterRepository;
-import com.fransis.repository.GroupRepository;
-import com.fransis.repository.WatcherRepository;
+import com.fransis.model.*;
+import com.fransis.repository.*;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by francisco on 26/09/2016.
@@ -26,6 +23,9 @@ import java.util.Collection;
 @Component("watchController")
 public class WatchController {
 
+    private static final String MY_APP_ID = "1334300239928512";
+    private static final String MY_APP_SECRET = "fd26d7bc50496527912c4abcee2bf172";
+
     @Autowired
     private WatcherRepository watcherRepository;
     @Autowired
@@ -34,6 +34,8 @@ public class WatchController {
     private FilterRepository filterRepository;
     @Autowired
     private GroupRepository groupRepository;
+    @Autowired
+    private UsernameRepository usernameRepository;
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Watcher> create(@RequestBody Watcher watcher){
@@ -56,7 +58,7 @@ public class WatchController {
     @RequestMapping(value = "/{id}/emails", method = RequestMethod.GET)
     public ResponseEntity<Collection<Email>> getEmails(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        Collection<Email> emails = watcherRepo.getEmails();
+        List<Email> emails = watcherRepo.getEmails();
         return (ResponseEntity.status(HttpStatus.OK)).body(emails);
     }
 
@@ -64,7 +66,7 @@ public class WatchController {
     public ResponseEntity<Email> createEmail(@PathVariable Long id, @RequestBody Email email){
         Watcher watcherRepo = watcherRepository.findOne(id);
         Email emailRepo = emailRepository.saveAndFlush(email);
-        Collection<Email> emails = watcherRepo.getEmails();
+        List<Email> emails = watcherRepo.getEmails();
         emails.add(emailRepo);
         watcherRepository.saveAndFlush(watcherRepo);
 
@@ -81,7 +83,7 @@ public class WatchController {
     @RequestMapping(value = "/{id}/filters", method = RequestMethod.GET)
     public ResponseEntity<Collection<FbFilter>> getFilters(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        Collection<FbFilter> filters = watcherRepo.getFilters();
+        List<FbFilter> filters = watcherRepo.getFilters();
         return (ResponseEntity.status(HttpStatus.OK)).body(filters);
     }
 
@@ -89,7 +91,8 @@ public class WatchController {
     public ResponseEntity<FbFilter> createFilter(@PathVariable Long id, @RequestBody FbFilter filter){
         Watcher watcherRepo = watcherRepository.findOne(id);
         FbFilter repo = filterRepository.saveAndFlush(filter);
-        Collection<FbFilter> collection = watcherRepo.getFilters();
+        filterRepository.flush();
+        List<FbFilter> collection = watcherRepo.getFilters();
         collection.add(repo);
         watcherRepository.saveAndFlush(watcherRepo);
         URI location = null;
@@ -104,7 +107,7 @@ public class WatchController {
     @RequestMapping(value = "/{id}/groups", method = RequestMethod.GET)
     public ResponseEntity<Collection<FbGroup>> getGroups(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        Collection<FbGroup> groups = watcherRepo.getGroups();
+        List<FbGroup> groups = watcherRepo.getGroups();
         return (ResponseEntity.status(HttpStatus.OK)).body(groups);
     }
 
@@ -112,7 +115,7 @@ public class WatchController {
     public ResponseEntity<FbGroup> createGroup(@PathVariable Long id, @RequestBody FbGroup group){
         Watcher watcherRepo = watcherRepository.findOne(id);
         FbGroup repo = groupRepository.saveAndFlush(group);
-        Collection<FbGroup> collection = watcherRepo.getGroups();
+        List<FbGroup> collection = watcherRepo.getGroups();
         collection.add(repo);
         watcherRepository.saveAndFlush(watcherRepo);
         URI location = null;
@@ -122,6 +125,33 @@ public class WatchController {
             return (ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)).body(null);
         }
         return (ResponseEntity.status(HttpStatus.CREATED)).location(location).body(repo);
+    }
+
+    @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
+    public ResponseEntity<FbUsername> getUser(@PathVariable Long id){
+        Watcher watcherRepo = watcherRepository.findOne(id);
+        FbUsername username = watcherRepo.getUsername();
+        return (ResponseEntity.status(HttpStatus.OK)).body(username);
+    }
+
+    @RequestMapping(value = "/{id}/users", method = RequestMethod.POST)
+    public ResponseEntity<FbUsername> createUser(@PathVariable Long id, @RequestBody FbUsername user){
+        Watcher watcherRepo = watcherRepository.findOne(id);
+
+        FacebookClient.AccessToken accessTokenExtended =
+                new DefaultFacebookClient().obtainExtendedAccessToken(MY_APP_ID,
+                        MY_APP_SECRET, user.getAccessToken());
+        FbUsername user2 = new FbUsername(user.getUsername(), accessTokenExtended.getAccessToken());
+        FbUsername repo = usernameRepository.saveAndFlush(user2);
+        watcherRepo.setUsername(repo);
+        watcherRepository.saveAndFlush(watcherRepo);
+        URI location = null;
+        try {
+            location = new URI("/w/" + watcherRepo.getId() + "/users/" + repo.getUsername());
+        } catch (URISyntaxException e) {
+            return (ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)).body(null);
+        }
+        return (ResponseEntity.status(HttpStatus.CREATED)).location(location).body(user2);
     }
 
 }

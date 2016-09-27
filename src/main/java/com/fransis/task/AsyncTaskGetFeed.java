@@ -22,15 +22,11 @@ public class AsyncTaskGetFeed implements Runnable{
 
     private FeedRepository feedRepository;
 
-    private FbGroup fbGroup;
-    private FbUsername fbUsername;
     private Watcher watcher;
     private EmailSender sender;
 
-    public AsyncTaskGetFeed(FeedRepository feedRepository, EmailSender emailSender, Watcher watcher, FbUsername fbUsername) {
-        this.fbGroup = watcher.getGroups().iterator().next();
-        this.fbUsername = fbUsername;
-        this.accessToken = fbUsername.getAccessToken();
+    public AsyncTaskGetFeed(FeedRepository feedRepository, EmailSender emailSender, Watcher watcher) {
+        this.accessToken = watcher.getUsername().getAccessToken();
         facebookClient = new DefaultFacebookClient( this.accessToken, Version.VERSION_2_7);
         this.feedRepository = feedRepository;
         this.watcher = watcher;
@@ -38,29 +34,32 @@ public class AsyncTaskGetFeed implements Runnable{
     }
 
     public void run() {
-            groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields","id,message,from"), Parameter.with("limit", 1000));
-            JsonArray data = groupFeeds.getJsonArray("data");
-            for(int i = 0; i < data.length(); i++){
-                JsonObject feed = data.getJsonObject(i);
-                if(feed.has("message")) {
-                    String message = feed.getString("message");
-                    System.out.println(message);
-                    if(!feedRepository.exists(feed.getString("id"))){
-                        boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> message.contains(fbFilter.getValue()));
-                        if(m){
-                            //Notificar
-                            FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
-                            feedRepository.saveAndFlush(fbMessage);
-                            System.out.println("Alerta: " + message);
-                            Email dst = watcher.getEmails().iterator().next();
-                            StringBuilder html = new StringBuilder();
-                            html.append("El post id " + fbMessage.getId());
-                            html.append(" contiene el siguiente texto<br><b>");
-                            html.append(fbMessage.getMessage() + "</b><br>");
-                            html.append("El post fue realizado por <b>");
-                            JsonObject from = feed.getJsonObject("from");
-                            html.append(from.getString("name") + "</b>");
-                            sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDesc(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
+            for(FbGroup fbGroup: watcher.getGroups()) {
+                groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,from"), Parameter.with("limit", 1000));
+                JsonArray data = groupFeeds.getJsonArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    JsonObject feed = data.getJsonObject(i);
+                    if (feed.has("message")) {
+                        String message = feed.getString("message");
+                        System.out.println(message);
+                        if (!feedRepository.exists(feed.getString("id"))) {
+                            boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> message.contains(fbFilter.getValue()));
+                            if (m) {
+                                //Notificar
+                                FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
+                                feedRepository.saveAndFlush(fbMessage);
+                                System.out.println("Alerta: " + message);
+                                StringBuilder html = new StringBuilder();
+                                html.append("El post id <br><b>" + fbMessage.getId());
+                                html.append("</b><br>Contiene el siguiente texto<br><b>");
+                                html.append(fbMessage.getMessage() + "</b><br>");
+                                html.append("El post fue realizado por <b>");
+                                JsonObject from = feed.getJsonObject("from");
+                                html.append(from.getString("name") + "</b>");
+                                for (Email dst : watcher.getEmails()) {
+                                    sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDesc(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
+                                }
+                            }
                         }
                     }
                 }

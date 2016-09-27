@@ -2,8 +2,10 @@ package com.fransis.model;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by francisco on 9/25/16.
@@ -16,14 +18,17 @@ public class Watcher {
     private Long id;
     private String description;
 
-    @OneToMany(fetch=FetchType.EAGER)
-    private Collection<FbFilter> filters;
+    @ManyToOne
+    private FbUsername username;
 
-    @OneToMany(fetch=FetchType.EAGER)
-    private Collection<FbGroup> groups;
+    @OneToMany()
+    private List<FbFilter> filters;
 
-    @OneToMany(fetch=FetchType.EAGER)
-    private Collection<Email> emails;
+    @OneToMany()
+    private List<FbGroup> groups;
+
+    @OneToMany()
+    private List<Email> emails;
 
     public Watcher(String description) {
         this();
@@ -31,29 +36,38 @@ public class Watcher {
     }
 
     public Watcher() {
-        this.emails = new HashSet<>();
-        this.groups = new HashSet<>();
-        this.filters = new HashSet<>();
+        this.emails = new ArrayList<>();
+        this.groups = new ArrayList<>();
+        this.filters = new ArrayList<>();
     }
+
 
 
     public String getDescription() {
         return description;
     }
 
-    public Collection<FbFilter> getFilters() {
+    public List<FbFilter> getFilters() {
         return filters;
     }
 
-    public Collection<FbGroup> getGroups() {
+    public List<FbGroup> getGroups() {
         return groups;
     }
 
-    public Collection<Email> getEmails() {
+    public List<Email> getEmails() {
         return emails;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public FbUsername getUsername() {
+        return username;
+    }
+
+    public void setUsername(FbUsername username) {
+        this.username = username;
     }
 }

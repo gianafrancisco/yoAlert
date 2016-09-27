@@ -29,17 +29,32 @@ public class ScheduleTask {
     @Autowired
     private FeedRepository feedRepository;
     @Autowired
-    private UsernameRepository usernameRepository;
-    @Autowired
     private EmailSender sender;
     @Autowired
     private WatcherRepository watcherRepository;
+    @Autowired
+    private EmailRepository emailRepository;
+    @Autowired
+    private FilterRepository filterRepository;
+    @Autowired
+    private GroupRepository groupRepository;
+    @Autowired
+    private UsernameRepository usernameRepository;
 
     @Scheduled(fixedRate = 10000)
     public void verificar(){
         List<Watcher> watchers = watcherRepository.findAll();
         for(Watcher watcher: watchers){
+            List<FbUsername> usernameList = usernameRepository.findByWatcher(watcher);
+            FbUsername username = null;
+            if(usernameList.size() > 0) {
+                username = usernameList.get(0);
+                watcher.setUsername(username);
+            }
             if(watcher.getUsername() != null){
+                watcher.setGroups(groupRepository.findByWatcher(watcher));
+                watcher.setEmails(emailRepository.findByWatcher(watcher));
+                watcher.setFilters(filterRepository.findByWatcher(watcher));
                 AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher);
                 new Thread(asyncTaskGetFeed).start();
                 log.info("Verificando Feeds");

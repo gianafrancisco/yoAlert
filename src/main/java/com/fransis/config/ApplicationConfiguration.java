@@ -62,7 +62,7 @@ class ApplicationConfiguration {
         ps.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         ps.put("hibernate.hbm2ddl.auto", "create");
         ps.put("hibernate.archive.autodetection","class");
-        ps.put("hibernate.show_sql","true");
+        ps.put("hibernate.show_sql","false");
 
         entityManagerFactoryBean.setJpaProperties(ps);
         entityManagerFactoryBean.afterPropertiesSet();

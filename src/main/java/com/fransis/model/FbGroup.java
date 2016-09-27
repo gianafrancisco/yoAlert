@@ -1,5 +1,7 @@
 package com.fransis.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 /**
@@ -13,6 +15,10 @@ public class FbGroup {
     private Long id;
     private String groupId;
     private String groupName;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="WATCHER_ID")
+    private Watcher watcher;
 
     public FbGroup() {
         this.id = 0L;
@@ -34,5 +40,14 @@ public class FbGroup {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    @JsonIgnore
+    public Watcher getWatcher() {
+        return watcher;
+    }
+
+    public void setWatcher(Watcher watcher) {
+        this.watcher = watcher;
     }
 }

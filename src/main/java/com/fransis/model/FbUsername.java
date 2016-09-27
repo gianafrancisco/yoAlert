@@ -1,8 +1,8 @@
 package com.fransis.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 
 /**
  * Created by francisco on 9/4/16.
@@ -13,6 +13,10 @@ public class FbUsername {
     @Id
     private String username;
     private String accessToken;
+
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JoinColumn(name="WATCHER_ID")
+    private Watcher watcher;
 
     public FbUsername(String username, String accessToken) {
         this.username = username;
@@ -28,5 +32,14 @@ public class FbUsername {
 
     public String getAccessToken() {
         return accessToken;
+    }
+
+    @JsonIgnore
+    public Watcher getWatcher() {
+        return watcher;
+    }
+
+    public void setWatcher(Watcher watcher) {
+        this.watcher = watcher;
     }
 }

@@ -1,5 +1,7 @@
 package com.fransis.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 /**
@@ -13,6 +15,10 @@ public class Email {
     private Long id;
     private String email;
     private String desc;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="WATCHER_ID")
+    private Watcher watcher;
 
     public Email() {
     }
@@ -32,5 +38,14 @@ public class Email {
 
     public Long getId() {
         return id;
+    }
+
+    @JsonIgnore
+    public Watcher getWatcher() {
+        return watcher;
+    }
+
+    public void setWatcher(Watcher watcher) {
+        this.watcher = watcher;
     }
 }

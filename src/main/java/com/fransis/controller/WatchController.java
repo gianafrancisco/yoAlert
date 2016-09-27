@@ -52,23 +52,36 @@ public class WatchController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Watcher> getWatcher(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
+        watcherRepo.setGroups(groupRepository.findByWatcher(watcherRepo));
+        watcherRepo.setEmails(emailRepository.findByWatcher(watcherRepo));
+        watcherRepo.setFilters(filterRepository.findByWatcher(watcherRepo));
+        List<FbUsername> usernameList = usernameRepository.findByWatcher(watcherRepo);
+        FbUsername username = null;
+        if(usernameList.size() > 0) {
+            username = usernameList.get(0);
+            watcherRepo.setUsername(username);
+        }
         return (ResponseEntity.status(HttpStatus.OK)).body(watcherRepo);
     }
 
     @RequestMapping(value = "/{id}/emails", method = RequestMethod.GET)
     public ResponseEntity<Collection<Email>> getEmails(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        List<Email> emails = watcherRepo.getEmails();
+        List<Email> emails = emailRepository.findByWatcher(watcherRepo);
         return (ResponseEntity.status(HttpStatus.OK)).body(emails);
     }
 
     @RequestMapping(value = "/{id}/emails", method = RequestMethod.POST)
     public ResponseEntity<Email> createEmail(@PathVariable Long id, @RequestBody Email email){
         Watcher watcherRepo = watcherRepository.findOne(id);
+        email.setWatcher(watcherRepo);
         Email emailRepo = emailRepository.saveAndFlush(email);
+
+        /*
         List<Email> emails = watcherRepo.getEmails();
         emails.add(emailRepo);
         watcherRepository.saveAndFlush(watcherRepo);
+        */
 
         URI location = null;
         try {
@@ -83,18 +96,20 @@ public class WatchController {
     @RequestMapping(value = "/{id}/filters", method = RequestMethod.GET)
     public ResponseEntity<Collection<FbFilter>> getFilters(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        List<FbFilter> filters = watcherRepo.getFilters();
+        List<FbFilter> filters = filterRepository.findByWatcher(watcherRepo);
         return (ResponseEntity.status(HttpStatus.OK)).body(filters);
     }
 
     @RequestMapping(value = "/{id}/filters", method = RequestMethod.POST)
     public ResponseEntity<FbFilter> createFilter(@PathVariable Long id, @RequestBody FbFilter filter){
         Watcher watcherRepo = watcherRepository.findOne(id);
+        filter.setWatcher(watcherRepo);
         FbFilter repo = filterRepository.saveAndFlush(filter);
-        filterRepository.flush();
+        /*
         List<FbFilter> collection = watcherRepo.getFilters();
         collection.add(repo);
         watcherRepository.saveAndFlush(watcherRepo);
+        */
         URI location = null;
         try {
             location = new URI("/w/" + watcherRepo.getId() + "/filters/" + repo.getId());
@@ -107,17 +122,20 @@ public class WatchController {
     @RequestMapping(value = "/{id}/groups", method = RequestMethod.GET)
     public ResponseEntity<Collection<FbGroup>> getGroups(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        List<FbGroup> groups = watcherRepo.getGroups();
+        List<FbGroup> groups = groupRepository.findByWatcher(watcherRepo);
         return (ResponseEntity.status(HttpStatus.OK)).body(groups);
     }
 
     @RequestMapping(value = "/{id}/groups", method = RequestMethod.POST)
     public ResponseEntity<FbGroup> createGroup(@PathVariable Long id, @RequestBody FbGroup group){
         Watcher watcherRepo = watcherRepository.findOne(id);
+        group.setWatcher(watcherRepo);
         FbGroup repo = groupRepository.saveAndFlush(group);
+        /*
         List<FbGroup> collection = watcherRepo.getGroups();
         collection.add(repo);
         watcherRepository.saveAndFlush(watcherRepo);
+        */
         URI location = null;
         try {
             location = new URI("/w/" + watcherRepo.getId() + "/groups/" + repo.getId());
@@ -130,7 +148,11 @@ public class WatchController {
     @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
     public ResponseEntity<FbUsername> getUser(@PathVariable Long id){
         Watcher watcherRepo = watcherRepository.findOne(id);
-        FbUsername username = watcherRepo.getUsername();
+        List<FbUsername> usernameList = usernameRepository.findByWatcher(watcherRepo);
+        FbUsername username = null;
+        if(usernameList.size() > 0) {
+            username = usernameList.get(0);
+        }
         return (ResponseEntity.status(HttpStatus.OK)).body(username);
     }
 
@@ -142,9 +164,12 @@ public class WatchController {
                 new DefaultFacebookClient().obtainExtendedAccessToken(MY_APP_ID,
                         MY_APP_SECRET, user.getAccessToken());
         FbUsername user2 = new FbUsername(user.getUsername(), accessTokenExtended.getAccessToken());
+        user2.setWatcher(watcherRepo);
         FbUsername repo = usernameRepository.saveAndFlush(user2);
+        /*
         watcherRepo.setUsername(repo);
         watcherRepository.saveAndFlush(watcherRepo);
+        */
         URI location = null;
         try {
             location = new URI("/w/" + watcherRepo.getId() + "/users/" + repo.getUsername());

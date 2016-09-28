@@ -20,9 +20,9 @@ before_install:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 after_success:
-  - docker build -t fgiana/yoAlert:latest .
-  - docker run --name yoAlert -d -P fgiana/yoAlert:latest
+  - docker build -t fgiana/yoalert:latest .
+  - docker run --name yoalert -d -P fgiana/yoalert:latest
   - docker ps
-  - docker port yoAlert
-  - docker push fgiana/yoAlert:latest
+  - docker port yoalert
+  - docker push fgiana/yoalert:latest
 

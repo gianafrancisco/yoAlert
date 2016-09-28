@@ -11,6 +11,7 @@ public class FbFeed {
     @Column(name = "id", unique = true, nullable = false)
     @Id
     private String id;
+    @Transient
     private String message;
 
     public FbFeed() {

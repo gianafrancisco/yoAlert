@@ -37,12 +37,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
                 http.httpBasic().and()
                 .authorizeRequests().anyRequest().authenticated();
+                http.csrf().disable();
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
+        auth.inMemoryAuthentication()
                 .withUser("Administrador").password("1qaz2wsx").roles("USER");
     }
 }

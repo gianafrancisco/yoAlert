@@ -128,7 +128,7 @@ class ApplicationConfigurationMysql extends ApplicationConfiguration {
         ps.put("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
         ps.put("hibernate.hbm2ddl.auto", "update");
         ps.put("hibernate.archive.autodetection","class");
-        ps.put("hibernate.show_sql","true");
+        ps.put("hibernate.show_sql","false");
 
         entityManagerFactoryBean.setJpaProperties(ps);
         entityManagerFactoryBean.afterPropertiesSet();

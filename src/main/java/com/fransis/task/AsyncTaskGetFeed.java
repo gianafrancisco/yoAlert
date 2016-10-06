@@ -41,14 +41,16 @@ public class AsyncTaskGetFeed implements Runnable{
                     JsonObject feed = data.getJsonObject(i);
                     if (feed.has("message")) {
                         String message = feed.getString("message");
-                        System.out.println(message);
+                        //System.out.println(message);
                         if (!feedRepository.exists(feed.getString("id"))) {
                             boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> message.contains(fbFilter.getValue()));
                             if (m) {
                                 //Notificar
                                 FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
                                 feedRepository.saveAndFlush(fbMessage);
+                                System.out.println("------------------------------------------");
                                 System.out.println("Alerta: " + message);
+                                System.out.println("------------------------------------------");
                                 StringBuilder html = new StringBuilder();
                                 html.append("El post id <br><b>" + fbMessage.getId());
                                 html.append("</b><br>Contiene el siguiente texto<br><b>");

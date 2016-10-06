@@ -10,6 +10,9 @@ import com.restfb.Version;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by francisco on 9/4/16.
  */
@@ -43,7 +46,14 @@ public class AsyncTaskGetFeed implements Runnable{
                         String message = feed.getString("message");
                         //System.out.println(message);
                         if (!feedRepository.exists(feed.getString("id"))) {
-                            boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> message.contains(fbFilter.getValue()));
+                            final List<FbFilter> list = new ArrayList<>();
+                            boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> {
+                                boolean ret = message.contains(fbFilter.getValue());
+                                if(ret){
+                                    list.add(fbFilter);
+                                }
+                                return ret;
+                            });
                             if (m) {
                                 //Notificar
                                 FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
@@ -57,7 +67,12 @@ public class AsyncTaskGetFeed implements Runnable{
                                 html.append(fbMessage.getMessage() + "</b><br>");
                                 html.append("El post fue realizado por <b>");
                                 JsonObject from = feed.getJsonObject("from");
-                                html.append(from.getString("name") + "</b>");
+                                html.append(from.getString("name") + "</b><br>");
+                                html.append("Las palabras encontadas son: <br><b>");
+                                for(FbFilter f: list){
+                                    html.append(f.getValue() + "<br>");
+                                }
+                                html.append("</b>");
                                 for (Email dst : watcher.getEmails()) {
                                     sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDescription(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
                                 }

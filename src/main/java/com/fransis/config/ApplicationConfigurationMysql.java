@@ -82,6 +82,8 @@ class ApplicationConfigurationMysql extends ApplicationConfiguration {
         dataSource.setUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
+        dataSource.setTestOnBorrow(true);
+        dataSource.setValidationQuery("SELECT 1");
         return dataSource;
     }
 

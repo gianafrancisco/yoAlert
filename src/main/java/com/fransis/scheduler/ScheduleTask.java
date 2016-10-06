@@ -41,7 +41,7 @@ public class ScheduleTask {
     @Autowired
     private UsernameRepository usernameRepository;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 60000)
     public void verificar(){
         List<Watcher> watchers = watcherRepository.findAll();
         for(Watcher watcher: watchers){

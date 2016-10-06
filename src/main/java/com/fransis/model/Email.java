@@ -14,7 +14,7 @@ public class Email {
     @Id
     private Long id;
     private String email;
-    private String desc;
+    private String description;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="WATCHER_ID")
@@ -23,17 +23,17 @@ public class Email {
     public Email() {
     }
 
-    public Email(String email, String desc) {
+    public Email(String email, String description) {
         this.email = email;
-        this.desc = desc;
+        this.description = description;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
     public Long getId() {

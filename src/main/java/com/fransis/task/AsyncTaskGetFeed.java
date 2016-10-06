@@ -57,7 +57,7 @@ public class AsyncTaskGetFeed implements Runnable{
                                 JsonObject from = feed.getJsonObject("from");
                                 html.append(from.getString("name") + "</b>");
                                 for (Email dst : watcher.getEmails()) {
-                                    sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDesc(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
+                                    sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDescription(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
                                 }
                             }
                         }

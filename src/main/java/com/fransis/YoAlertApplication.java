@@ -32,39 +32,38 @@ public class YoAlertApplication {
 	@Bean
 	public CommandLineRunner loadData(GroupRepository groupRepository, EmailRepository emailRepository, UsernameRepository usernameRepository, FilterRepository filterRepository, WatcherRepository watcherRepository) {
 		return (args) -> {
-			/*
-			Email email = new Email("gianafrancisco@gmail.com", "Francisco Giana");
-			email = emailRepository.saveAndFlush(email);
-
-			FbGroup fbGroup = new FbGroup("1027119427344209", "Prueba API");
-			fbGroup = groupRepository.saveAndFlush(fbGroup);
-
-			String accessToken = System.getProperty("access_token","");
-
-			FacebookClient.AccessToken accessTokenExtended =
-					new DefaultFacebookClient().obtainExtendedAccessToken(MY_APP_ID,
-							MY_APP_SECRET, accessToken);
-
-			System.out.println("Access Token: " + accessTokenExtended);
-			FbUsername fbUsername = new FbUsername("franciscogiana@hotmail.com", accessTokenExtended.getAccessToken());
-			fbUsername = usernameRepository.saveAndFlush(fbUsername);
-
-			String filters = System.getProperty("filters", "");
 
 
-			Watcher watcher = new Watcher("NZ Group");
-			watcher.getEmails().add(email);
-			watcher.getFilters();
-			watcher.getGroups().add(fbGroup);
+			if(watcherRepository.findAll().size() == 0){
 
-			Arrays.stream(filters.split(",")).forEach(s -> {
-				FbFilter fbFilter = new FbFilter(s);
-				fbFilter = filterRepository.saveAndFlush(fbFilter);
-				watcher.getFilters().add(fbFilter);
-			});
+				Watcher watcher = new Watcher("NZ");
+				watcherRepository.save(watcher);
 
-			watcherRepository.save(watcher);
-			*/
+				Email email = new Email("gianafrancisco@gmail.com", "Francisco Giana");
+				email.setWatcher(watcher);
+				email = emailRepository.saveAndFlush(email);
+
+				email = new Email("berna@yomeanimoyvos.com", "Bernardo Cari");
+				email.setWatcher(watcher);
+
+				email = emailRepository.saveAndFlush(email);
+
+				FbGroup fbGroup = new FbGroup("223419024459146", "Nueva Zelanda - yomeanimoyvos.com");
+				fbGroup.setWatcher(watcher);
+				fbGroup = groupRepository.saveAndFlush(fbGroup);
+
+				String filters = System.getProperty("filters", "orbit,protect,manualdemanuel,argentinoporelmundo,assist,asegura,aseguratuviaje,whatsap,whatsapp,chanta,greattrips,great,trips,1500,cantone,seguros,seguro,351,agreguen,agreguenme,sinlimites,agencia,caradura,estafa,universal");
+
+				Arrays.stream(filters.split(",")).forEach(s -> {
+					FbFilter fbFilter = new FbFilter(s.trim());
+					fbFilter.setWatcher(watcher);
+					fbFilter = filterRepository.saveAndFlush(fbFilter);
+				});
+
+
+
+			}
+
 		};
 	}
 

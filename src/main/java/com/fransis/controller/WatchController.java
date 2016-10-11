@@ -77,11 +77,6 @@ public class WatchController {
         email.setWatcher(watcherRepo);
         Email emailRepo = emailRepository.saveAndFlush(email);
 
-        /*
-        List<Email> emails = watcherRepo.getEmails();
-        emails.add(emailRepo);
-        watcherRepository.saveAndFlush(watcherRepo);
-        */
 
         URI location = null;
         try {
@@ -105,11 +100,7 @@ public class WatchController {
         Watcher watcherRepo = watcherRepository.findOne(id);
         filter.setWatcher(watcherRepo);
         FbFilter repo = filterRepository.saveAndFlush(filter);
-        /*
-        List<FbFilter> collection = watcherRepo.getFilters();
-        collection.add(repo);
-        watcherRepository.saveAndFlush(watcherRepo);
-        */
+
         URI location = null;
         try {
             location = new URI("/w/" + watcherRepo.getId() + "/filters/" + repo.getId());
@@ -117,6 +108,20 @@ public class WatchController {
             return (ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)).body(null);
         }
         return (ResponseEntity.status(HttpStatus.CREATED)).location(location).body(repo);
+    }
+
+    @RequestMapping(value = "/{id}/filters/{idFilter}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteFilter(@PathVariable Long id, @PathVariable Long idFilter){
+
+        FbFilter filter = filterRepository.findOne(idFilter);
+        if(filter != null){
+            filterRepository.delete(idFilter);
+            filterRepository.flush();
+            return (ResponseEntity.status(HttpStatus.NO_CONTENT)).build();
+        }else{
+            return (ResponseEntity.status(HttpStatus.NOT_FOUND)).build();
+        }
+
     }
 
     @RequestMapping(value = "/{id}/groups", method = RequestMethod.GET)
@@ -131,11 +136,7 @@ public class WatchController {
         Watcher watcherRepo = watcherRepository.findOne(id);
         group.setWatcher(watcherRepo);
         FbGroup repo = groupRepository.saveAndFlush(group);
-        /*
-        List<FbGroup> collection = watcherRepo.getGroups();
-        collection.add(repo);
-        watcherRepository.saveAndFlush(watcherRepo);
-        */
+
         URI location = null;
         try {
             location = new URI("/w/" + watcherRepo.getId() + "/groups/" + repo.getId());
@@ -166,10 +167,7 @@ public class WatchController {
         FbUsername user2 = new FbUsername(user.getUsername(), accessTokenExtended.getAccessToken());
         user2.setWatcher(watcherRepo);
         FbUsername repo = usernameRepository.saveAndFlush(user2);
-        /*
-        watcherRepo.setUsername(repo);
-        watcherRepository.saveAndFlush(watcherRepo);
-        */
+
         URI location = null;
         try {
             location = new URI("/w/" + watcherRepo.getId() + "/users/" + repo.getUsername());

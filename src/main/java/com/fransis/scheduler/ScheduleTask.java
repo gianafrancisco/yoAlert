@@ -10,6 +10,8 @@ import com.fransis.model.FbUsername;
 import com.fransis.model.Watcher;
 import com.fransis.repository.*;
 import com.fransis.task.AsyncTaskGetFeed;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +57,10 @@ public class ScheduleTask {
                 watcher.setGroups(groupRepository.findByWatcher(watcher));
                 watcher.setEmails(emailRepository.findByWatcher(watcher));
                 watcher.setFilters(filterRepository.findByWatcher(watcher));
-                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher);
+                DefaultFacebookClient facebookClient = new DefaultFacebookClient(watcher.getUsername().getAccessToken(), Version.VERSION_2_7);
+                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher, facebookClient);
+                log.info("Verificando grupos");
                 new Thread(asyncTaskGetFeed).start();
-                log.info("Verificando Feeds");
             }
         }
     }

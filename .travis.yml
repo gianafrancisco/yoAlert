@@ -11,8 +11,8 @@ install:
 #  - cd src/main/gui/ && npm install && bower install
 #  - grunt build --force
 #  - cd ../../../
-  - mvn install -Dmaven.javadoc.skip=true -B -V
-# - mvn install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
+#  - mvn install -Dmaven.javadoc.skip=true -B -V
+  - mvn install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
 
 before_install:
 #  - sudo apt-get update && sudo apt-get install -y nodejs npm

@@ -70,9 +70,29 @@ public class AsyncTaskGetFeedTest {
         FbFilter filter = new FbFilter("seguro");
         watcher.getFilters().add(filter);
         watcher.getEmails().add(new Email("ggg@gm.com", "Admin"));
-        watcher.setUsername(new FbUsername("usuario1", "ddddd", "123456789"));
+        watcher.setUsername(new FbUsername("usuario1", "ddddd", "391673694373589"));
 
-        facebookMock = new FacebookMock("Quiero vernder mi SeGuRo", "Elver Galarga", "123456789");
+        facebookMock = new FacebookMock("Quiero vernder mi SeGuRo", "Elver Galarga", "391673694373589");
+        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock);
+        feed.run();
+
+        Assert.assertThat(feedRepository.findAll().size(), is(1));
+        Assert.assertThat(emailSender.getEmailEnviados(), is(0));
+
+    }
+
+    @Test
+    public void ignore_notified_when_admin_group_trim_id() throws Exception {
+
+        watcher = new Watcher();
+        FbGroup group = new FbGroup("1111111", "Test 1");
+        watcher.getGroups().add(group);
+        FbFilter filter = new FbFilter("seguro");
+        watcher.getFilters().add(filter);
+        watcher.getEmails().add(new Email("ggg@gm.com", "Admin"));
+        watcher.setUsername(new FbUsername("usuario1", "ddddd", "391673694373589"));
+
+        facebookMock = new FacebookMock("Quiero vernder mi SeGuRo", "Elver Galarga", " 391673694373589");
         feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock);
         feed.run();
 

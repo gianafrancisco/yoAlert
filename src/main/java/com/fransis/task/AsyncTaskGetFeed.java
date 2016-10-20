@@ -42,7 +42,7 @@ public class AsyncTaskGetFeed implements Runnable{
                         if (!feedRepository.exists(feed.getString("id"))) {
                             final List<FbFilter> list = new ArrayList<>();
                             boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> {
-                                boolean ret = message.contains(fbFilter.getValue());
+                                boolean ret = message.toLowerCase().contains(fbFilter.getValue().toLowerCase());
                                 if(ret){
                                     list.add(fbFilter);
                                 }
@@ -51,6 +51,7 @@ public class AsyncTaskGetFeed implements Runnable{
                             if (m) {
                                 //Notificar
                                 FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
+                                JsonObject from = feed.getJsonObject("from");
                                 feedRepository.saveAndFlush(fbMessage);
                                 System.out.println("------------------------------------------");
                                 System.out.println("Alerta: " + message);
@@ -60,15 +61,17 @@ public class AsyncTaskGetFeed implements Runnable{
                                 html.append("</b><br>Contiene el siguiente texto<br><b>");
                                 html.append(fbMessage.getMessage() + "</b><br>");
                                 html.append("El post fue realizado por <b>");
-                                JsonObject from = feed.getJsonObject("from");
                                 html.append(from.getString("name") + "</b><br>");
                                 html.append("Las palabras encontadas son: <br><b>");
                                 for(FbFilter f: list){
                                     html.append(f.getValue() + "<br>");
                                 }
                                 html.append("</b>");
-                                for (Email dst : watcher.getEmails()) {
-                                    sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDescription(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
+
+                                if(!from.getString("id").equals(watcher.getUsername().getUsuarioId())){
+                                    for (Email dst : watcher.getEmails()) {
+                                        sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDescription(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
+                                    }
                                 }
                             }
                         }

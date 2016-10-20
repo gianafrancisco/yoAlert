@@ -13,14 +13,16 @@ public class FbUsername {
     @Id
     private String username;
     private String accessToken;
+    private String usuarioId;
 
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="WATCHER_ID")
     private Watcher watcher;
 
-    public FbUsername(String username, String accessToken) {
+    public FbUsername(String username, String accessToken, String usuarioId) {
         this.username = username;
         this.accessToken = accessToken;
+        this.usuarioId = usuarioId;
     }
 
     public FbUsername() {
@@ -41,5 +43,9 @@ public class FbUsername {
 
     public void setWatcher(Watcher watcher) {
         this.watcher = watcher;
+    }
+
+    public String getUsuarioId() {
+        return usuarioId;
     }
 }

@@ -68,7 +68,12 @@ public class AsyncTaskGetFeed implements Runnable{
                                 }
                                 html.append("</b>");
 
-                                if(!from.getString("id").trim().toLowerCase().equals(watcher.getUsername().getUsuarioId().trim().toLowerCase())){
+                                System.out.println("From ID:" + from.getString("id"));
+                                System.out.println("FbUser ID:" + watcher.getUsername().getUsuarioId());
+                                if(!from.getString("id")
+                                        .trim()
+                                        .toLowerCase()
+                                        .equals(watcher.getUsername().getUsuarioId().trim().toLowerCase())){
                                     for (Email dst : watcher.getEmails()) {
                                         sender.send("no-reply@yomeanimoyvos.com", "Alertas Yo me animo", dst.getEmail(), dst.getDescription(), "Alertas de grupo " + fbGroup.getGroupName(), html.toString());
                                     }

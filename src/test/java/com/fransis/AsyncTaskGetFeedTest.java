@@ -127,6 +127,7 @@ class FacebookMock extends DefaultFacebookClient {
         JsonObject feed = new JsonObject();
         feed.put("message", message);
         feed.put("id", "XXXXXXXXXXXXXXXXXXXXX");
+        feed.put("permalink_url", "http://www.facebook.com.ar/groups/11111/permalink/22222");
         JsonObject from = new JsonObject();
         from.put("name", name);
         from.put("id", usuarioId);

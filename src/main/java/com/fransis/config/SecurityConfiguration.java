@@ -35,7 +35,11 @@ import java.io.IOException;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-                http.httpBasic().and()
+                http.httpBasic()
+                        .and()
+                        .authorizeRequests()
+                        .antMatchers("/wh").permitAll()
+                        .and()
                 .authorizeRequests().anyRequest().authenticated();
                 http.csrf().disable();
     }

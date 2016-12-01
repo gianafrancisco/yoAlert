@@ -46,4 +46,10 @@ public class WebhookController {
         }
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("");
     }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<Void> get(){
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

@@ -9,5 +9,5 @@ public class Entry {
     public String id;
     public long time;
     public List<String> changed_fields;
-    public List<Object> changes;
+    public List<Change> changes;
 }

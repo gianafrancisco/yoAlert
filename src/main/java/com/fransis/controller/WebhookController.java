@@ -2,13 +2,16 @@ package com.fransis.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fransis.email.EmailSender;
 import com.fransis.model.*;
 import com.fransis.repository.*;
+import com.google.common.collect.Lists;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
 import com.restfb.Version;
+import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -41,15 +42,25 @@ public class WebhookController {
     @Autowired
     private EmailSender sender;
 
+    private List<String> emailsTo;
+
     public WebhookController() {
         String token = System.getProperties().getProperty("leads_token", "");
+        String emails = System.getProperties().getProperty("emailTo", "");
+        if(!"".equals(emails)){
+            emailsTo = Lists.newArrayList(emails.split(","));
+        }
+        else {
+            emailsTo = Collections.emptyList();
+        }
         facebookClient = new DefaultFacebookClient(token, Version.VERSION_2_7);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> post(@RequestBody Update update) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(update);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(update);
         log.info(json);
         if(update.entry.size() > 0) {
             Entry entry = update.entry.get(0);
@@ -59,29 +70,37 @@ public class WebhookController {
                     Map<String, Long> leadMap = (Map<String, Long>) change.value;
                     log.info(String.valueOf(leadMap.get("leadgen_id")));
                     JsonObject data = facebookClient.fetchObject("/" + leadMap.get("leadgen_id"), JsonObject.class);
-                    //String pretty = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
-                    log.info(data.toString());
 
                     StringBuilder html = new StringBuilder();
-                    html.append("Datos del Formulario</b>");
-                    html.append(data.toString());
-                    html.append("</b>");
+                    html.append("Datos del Formulario<br>");
 
-                    String subject = "Datos del formulario " + leadMap.get("form_id");
-                    sender.send("no-reply@yomeanimoyvos.com", "Formularios YoMeAnimoYVos", "gianafrancisco@gmail.com", "Giana Francisco", subject, html.toString());
+                    String createTime = data.getString("created_time");
+                    html.append("<b>").append("Fecha: ").append(createTime).append("</b><br>");
+                    JsonArray fieldData = data.getJsonArray("field_data");
+                    for(int i = 0; i<fieldData.length(); i++){
+                        JsonObject field = fieldData.getJsonObject(i);
+                        html.append("<b>").append(field.getString("name")).append(": </b>");
+                        JsonArray values = field.getJsonArray("values");
+                        for(int k = 0; k<values.length(); k++){
+                            html.append(values.getString(k));
+                            if(k < values.length() - 1) {
+                                html.append(", ");
+                            }
+                        }
+                        html.append("<br>");
+                    }
+
+                    Object jsonPretty = objectMapper.readValue(data.toString(), Object.class);
+                    String pretty = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonPretty);
+                    log.info(pretty);
+                    String subject = "Alertas de formulario " + leadMap.get("form_id");
+                    //sender.send("no-reply@yomeanimoyvos.com", "Formularios YoMeAnimoYVos", "gianafrancisco@gmail.com", "Giana Francisco", subject, html.toString());
+                    for(String emailTo: emailsTo){
+                        sender.send("no-reply@yomeanimoyvos.com", "Alertas de formularios", emailTo, emailTo, subject, html.toString());
+                    }
                 }
             }
         }
-        /*
-        JsonObject oJson = objectMapper.readValue(json, JsonObject.class);
-        if(oJson.getString("object").equals("page")){
-            JsonObject entry = oJson.getJsonArray("entry").getJsonObject(0);
-            JsonObject change = entry.getJsonArray("changes").getJsonObject(0);
-            if(change.getString("field").equals("leadgen")){
-                JsonObject value = change.getJsonObject("value");
-                log.info(String.valueOf(value.getLong("leadgen_id")));
-            }
-        }*/
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

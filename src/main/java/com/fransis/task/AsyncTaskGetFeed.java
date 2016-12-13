@@ -40,7 +40,7 @@ public class AsyncTaskGetFeed implements Runnable{
 
     public void run() {
             for(FbGroup fbGroup: watcher.getGroups()) {
-                log.info("Grupo " + fbGroup.getGroupName());
+                //log.info("Grupo " + fbGroup.getGroupName());
                 groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,from,permalink_url"), Parameter.with("limit", 100));
                 JsonArray data = groupFeeds.getJsonArray("data");
                 for (int i = 0; i < data.length(); i++) {

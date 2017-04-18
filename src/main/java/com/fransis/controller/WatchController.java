@@ -164,7 +164,7 @@ public class WatchController {
         FacebookClient.AccessToken accessTokenExtended =
                 new DefaultFacebookClient().obtainExtendedAccessToken(MY_APP_ID,
                         MY_APP_SECRET, user.getAccessToken());
-        FbUsername user2 = new FbUsername(user.getUsername(), accessTokenExtended.getAccessToken(), "");
+        FbUsername user2 = new FbUsername(user.getUsername(), accessTokenExtended.getAccessToken(), user.getUsuarioId());
         user2.setWatcher(watcherRepo);
         FbUsername repo = usernameRepository.saveAndFlush(user2);
 

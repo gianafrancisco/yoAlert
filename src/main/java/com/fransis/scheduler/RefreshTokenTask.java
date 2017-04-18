@@ -46,7 +46,7 @@ public class RefreshTokenTask {
             user2.setWatcher(user.getWatcher());
             log.info("Current Token: " + user.getAccessToken());
             log.info("New Token: " + user2.getAccessToken());
-            //usernameRepository.saveAndFlush(user2);
+            usernameRepository.saveAndFlush(user2);
         }
     }
 

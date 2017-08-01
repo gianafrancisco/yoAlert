@@ -1,0 +1,1 @@
+docker exec alertas_db_1 sh -c 'exec mysqldump -B alertas -u root -p"XXXXX"' > backup.sql

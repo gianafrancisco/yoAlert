@@ -1,0 +1,33 @@
+version: '2'
+services:
+  alertas:
+    build: .
+    #image: "fgiana/yoalert"
+    ports:
+     - "8080:8080"
+     - "8181:8080"
+    links:
+      - db:database
+    environment:
+     - DB_PASSWORD=
+     - DB_USERNAME=alertas
+     - DB_HOST=database
+     - DB_NAME=alertas
+     - SENDINBLUE_KEY=
+     - EMAIL_TO=gianafrancisco@gmail.com,seguros@yomeanimoyvos.com
+     - LEADS_TOKEN=
+    volumes:
+     - /hosthome/fransis/git/mevoyseguro/site/mevoyseguro.com/:/var/www/html/
+  db:
+    image: "mariadb:10.0.31"
+    volumes:
+     - /database/:/var/lib/mysql/
+     #- sql/:/docker-entrypoint-initdb.d/
+     - /hosthome/fransis/git/yoAlert/sql/:/docker-entrypoint-initdb.d/
+    environment:
+     - MYSQL_USER=alertas
+     - MYSQL_PASSWORD=yomeanim
+     - MYSQL_DATABASE=alertas
+     - MYSQL_ROOT_PASSWORD=yomeanim
+    ports:
+     - "3306:3306"

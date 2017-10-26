@@ -27,9 +27,9 @@ public class AsyncTaskGetFeed implements Runnable{
     private Watcher watcher;
     private EmailSender sender;
 
-    private String fromEmail = "no-reply@yomeanimoyvos.com";
-    private String fromName = "Alertas Yo me animo";
-    private String subjectPrefix = "Alertas de grupo ";
+    private final String fromEmail = "no-reply@yomeanimoyvos.com";
+    private final String fromName = "Alertas Yo me animo";
+    private final String subjectPrefix = "Alertas de grupo ";
 
     public AsyncTaskGetFeed(FeedRepository feedRepository, EmailSender emailSender, Watcher watcher, DefaultFacebookClient facebookClient) {
         this.facebookClient = facebookClient;
@@ -40,7 +40,6 @@ public class AsyncTaskGetFeed implements Runnable{
 
     public void run() {
             for(FbGroup fbGroup: watcher.getGroups()) {
-                //log.info("Grupo " + fbGroup.getGroupName());
                 groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,from,permalink_url"), Parameter.with("limit", 100));
                 JsonArray data = groupFeeds.getJsonArray("data");
                 for (int i = 0; i < data.length(); i++) {

@@ -7,6 +7,7 @@ package com.fransis.scheduler;
 
 import com.fransis.email.EmailSender;
 import com.fransis.model.FbUsername;
+import com.fransis.model.LeadConfig;
 import com.fransis.model.Watcher;
 import com.fransis.repository.*;
 import com.fransis.task.AsyncTaskGetFeed;
@@ -35,6 +36,9 @@ public class RefreshTokenTask {
     @Autowired
     private UsernameRepository usernameRepository;
 
+    @Autowired
+    private LeadConfigRepository leadConfigRepository;
+
     @Scheduled(fixedRate = 86400000)
     public void refresh(){
         List<FbUsername> usernameList = usernameRepository.findAll();
@@ -49,5 +53,20 @@ public class RefreshTokenTask {
             usernameRepository.saveAndFlush(user2);
         }
     }
+
+    @Scheduled(fixedRate = 86400000)
+    public void refreshLead(){
+        List<LeadConfig> leadConfigs = leadConfigRepository.findAll();
+        for(LeadConfig config: leadConfigs){
+            FacebookClient.AccessToken accessTokenExtended =
+                    new DefaultFacebookClient().obtainExtendedAccessToken(config.getAppId(),
+                            config.getAppSecret(), config.getAccessToken());
+            log.info("Current Lead Token: " + config.getAccessToken());
+            config.setAccessToken(accessTokenExtended.getAccessToken());
+            log.info("New Lead Token: " + config.getAccessToken());
+            leadConfigRepository.saveAndFlush(config);
+        }
+    }
+
 
 }

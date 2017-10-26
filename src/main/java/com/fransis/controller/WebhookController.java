@@ -1,15 +1,12 @@
 package com.fransis.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fransis.email.EmailSender;
 import com.fransis.model.*;
-import com.fransis.repository.*;
+import com.fransis.repository.LeadConfigRepository;
 import com.google.common.collect.Lists;
 import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Parameter;
 import com.restfb.Version;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +37,9 @@ public class WebhookController {
 
     @Autowired
     private EmailSender sender;
+
+    @Autowired
+    private LeadConfigRepository leadConfigRepository;
 
     private List<String> emailsTo;
 
@@ -94,7 +93,6 @@ public class WebhookController {
                     String pretty = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonPretty);
                     log.info(pretty);
                     String subject = "Alertas de formulario " + leadMap.get("form_id");
-                    //sender.send("no-reply@yomeanimoyvos.com", "Formularios YoMeAnimoYVos", "gianafrancisco@gmail.com", "Giana Francisco", subject, html.toString());
                     for(String emailTo: emailsTo){
                         sender.send("no-reply@yomeanimoyvos.com", "Alertas de formularios", emailTo, emailTo, subject, html.toString());
                     }
@@ -117,5 +115,30 @@ public class WebhookController {
     public ResponseEntity<Void> get(){
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @RequestMapping(value = "/configs", method = RequestMethod.GET)
+    public ResponseEntity<List<LeadConfig>> leadConfig(){
+        return ResponseEntity.status(HttpStatus.OK).body(leadConfigRepository.findAll());
+    }
+
+    @RequestMapping(value = "/configs", method = RequestMethod.PUT)
+    public ResponseEntity<Void> leadConfig(@RequestBody LeadConfig config){
+        if(config != null){
+            leadConfigRepository.saveAndFlush(config);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @RequestMapping(value = "/configs/{id}", method = RequestMethod.POST)
+    public ResponseEntity<LeadConfig> leadConfig(@PathVariable Long id, @RequestBody LeadConfig config){
+        if(leadConfigRepository.exists(id) && config != null && config.getId() == id){
+            leadConfigRepository.saveAndFlush(config);
+            return ResponseEntity.status(HttpStatus.OK).body(config);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+
 
 }

@@ -9,13 +9,13 @@ services:
     links:
       - db:database
     environment:
-     - DB_PASSWORD=
+     - DB_PASSWORD=yomeanim
      - DB_USERNAME=alertas
      - DB_HOST=database
      - DB_NAME=alertas
-     - SENDINBLUE_KEY=
+     - SENDINBLUE_KEY=GjrYSxIvUkc98sDq
      - EMAIL_TO=gianafrancisco@gmail.com,seguros@yomeanimoyvos.com
-     - LEADS_TOKEN=
+     - LEADS_TOKEN=EAADLHFkfsMgBAGFRCp3eodVMMHvsZA72p7Y0FZBz2xJqnmUf4sffP1CMhazhI6xNHzmA9KILnEhmfumk9iicQRqV2OZBj9zWvqF0Ixvju17HQQ5DnZBZCpUoOfiF3mSMQbPD4ZCZCru7fczZBSrljRJY20ot5APaqXoZD
     volumes:
      - /hosthome/fransis/git/mevoyseguro/site/mevoyseguro.com/:/var/www/html/
   db:

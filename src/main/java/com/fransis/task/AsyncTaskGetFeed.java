@@ -42,12 +42,12 @@ public class AsyncTaskGetFeed implements Runnable{
             for(FbGroup fbGroup: watcher.getGroups()) {
                 //log.info("Grupo " + fbGroup.getGroupName());
                 groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,from,permalink_url"), Parameter.with("limit", 100));
-                JsonArray data = groupFeeds.getJsonArray("data");
-                for (int i = 0; i < data.length(); i++) {
-                    JsonObject feed = data.getJsonObject(i);
-                    if (feed.has("message")) {
-                        String message = feed.getString("message");
-                        if (!feedRepository.exists(feed.getString("id"))) {
+                JsonArray data = groupFeeds.get("data").asArray();
+                for (int i = 0; i < data.size(); i++) {
+                    JsonObject feed = data.get(i).asObject();
+                    if (feed.get("message") != null) {
+                        String message = feed.get("message").asString();
+                        if (!feedRepository.exists(feed.get("id").asString())) {
                             final List<FbFilter> list = new ArrayList<>();
                             boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> {
                                 boolean ret = message.toLowerCase().contains(fbFilter.getValue().toLowerCase());
@@ -58,8 +58,8 @@ public class AsyncTaskGetFeed implements Runnable{
                             });
                             if (m) {
                                 //Notificar
-                                FbFeed fbMessage = new FbFeed(feed.getString("id"), feed.getString("message"));
-                                JsonObject from = feed.getJsonObject("from");
+                                FbFeed fbMessage = new FbFeed(feed.get("id").asString(), feed.get("message").asString());
+                                JsonObject from = feed.get("from").asObject();
                                 feedRepository.saveAndFlush(fbMessage);
                                 log.info("------------------------------------------");
                                 log.info("Alerta: " + message);
@@ -69,9 +69,9 @@ public class AsyncTaskGetFeed implements Runnable{
                                 html.append("</b><br>Contiene el siguiente texto<br><b>");
                                 html.append(fbMessage.getMessage() + "</b><br>");
                                 html.append("El post fue realizado por <b>");
-                                html.append(from.getString("name") + "</b><br>");
-                                if(feed.has("permalink_url")){
-                                    String permalinkUrl = feed.getString("permalink_url");
+                                html.append(from.get("name").asString() + "</b><br>");
+                                if(feed.get("permalink_url") != null){
+                                    String permalinkUrl = feed.get("permalink_url").asString();
                                     html.append("Link del post es " + permalinkUrl + "<br>");
                                     log.debug("permalink_url " + permalinkUrl);
                                 }
@@ -81,9 +81,9 @@ public class AsyncTaskGetFeed implements Runnable{
                                 }
                                 html.append("</b>");
 
-                                log.debug("From ID:" + from.getString("id"));
+                                log.debug("From ID:" + from.get("id").asString());
                                 log.debug("FbUser ID:" + watcher.getUsername().getUsuarioId());
-                                if(!from.getString("id")
+                                if(!from.get("id").asString()
                                         .trim()
                                         .toLowerCase()
                                         .equals(watcher.getUsername().getUsuarioId().trim().toLowerCase())){

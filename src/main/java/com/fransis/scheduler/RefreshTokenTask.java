@@ -16,6 +16,7 @@ import com.restfb.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +28,10 @@ import java.util.List;
 @Component("refreshTokenTask")
 public class RefreshTokenTask {
 
-    private static final String MY_APP_ID = "1334300239928512";
-    private static final String MY_APP_SECRET = "fd26d7bc50496527912c4abcee2bf172";
+    @Value("${fb.appId}")
+    private String MY_APP_ID = "";
+    @Value("${fb.appSecret}")
+    private String MY_APP_SECRET = "";
 
     private static final Logger log = LoggerFactory.getLogger(RefreshTokenTask.class);
 

@@ -4,6 +4,7 @@ import com.fransis.model.*;
 import com.fransis.repository.*;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -22,8 +23,10 @@ import java.util.Arrays;
 @EnableAutoConfiguration
 public class YoAlertApplication {
 
-	private static final String MY_APP_ID = "1334300239928512";
-	private static final String MY_APP_SECRET = "fd26d7bc50496527912c4abcee2bf172";
+	@Value("${fb.appId}")
+	private String MY_APP_ID = "";
+	@Value("${fb.appSecret}")
+	private String MY_APP_SECRET = "";
 
 	public static void main(String[] args) {
 		SpringApplication.run(YoAlertApplication.class, args);

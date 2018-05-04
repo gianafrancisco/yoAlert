@@ -53,7 +53,7 @@ public class WebhookController {
         else {
             emailsTo = Collections.emptyList();
         }
-        facebookClient = new DefaultFacebookClient(token, Version.VERSION_2_7);
+        facebookClient = new DefaultFacebookClient(token, Version.VERSION_2_12);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -74,16 +74,16 @@ public class WebhookController {
                     StringBuilder html = new StringBuilder();
                     html.append("Datos del Formulario<br>");
 
-                    String createTime = data.getString("created_time");
+                    String createTime = data.get("created_time").asString();
                     html.append("<b>").append("Fecha: ").append(createTime).append("</b><br>");
-                    JsonArray fieldData = data.getJsonArray("field_data");
-                    for(int i = 0; i<fieldData.length(); i++){
-                        JsonObject field = fieldData.getJsonObject(i);
-                        html.append("<b>").append(field.getString("name")).append(": </b>");
-                        JsonArray values = field.getJsonArray("values");
-                        for(int k = 0; k<values.length(); k++){
-                            html.append(values.getString(k));
-                            if(k < values.length() - 1) {
+                    JsonArray fieldData = data.get("field_data").asArray();
+                    for(int i = 0; i<fieldData.size(); i++){
+                        JsonObject field = fieldData.get(i).asObject();
+                        html.append("<b>").append(field.get("name").asString()).append(": </b>");
+                        JsonArray values = field.get("values").asArray();
+                        for (int k = 0; k < values.size(); k++) {
+                            html.append(values.get(k).asString());
+                            if (k < values.size() - 1) {
                                 html.append(", ");
                             }
                         }

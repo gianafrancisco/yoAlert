@@ -57,7 +57,7 @@ public class ScheduleTask {
                 watcher.setGroups(groupRepository.findByWatcher(watcher));
                 watcher.setEmails(emailRepository.findByWatcher(watcher));
                 watcher.setFilters(filterRepository.findByWatcher(watcher));
-                DefaultFacebookClient facebookClient = new DefaultFacebookClient(watcher.getUsername().getAccessToken(), Version.VERSION_2_7);
+                DefaultFacebookClient facebookClient = new DefaultFacebookClient(watcher.getUsername().getAccessToken(), Version.VERSION_2_12);
                 AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher, facebookClient);
                 log.info("Verificando grupos");
                 new Thread(asyncTaskGetFeed).start();

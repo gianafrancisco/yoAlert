@@ -59,7 +59,7 @@ public class AsyncTaskGetFeed implements Runnable{
                             if (m) {
                                 //Notificar
                                 FbFeed fbMessage = new FbFeed(feed.get("id").asString(), feed.get("message").asString());
-                                JsonObject from = feed.get("from").asObject();
+                                //JsonObject from = feed.get("from").asObject();
                                 feedRepository.saveAndFlush(fbMessage);
                                 log.info("------------------------------------------");
                                 log.info("Alerta: " + message);
@@ -68,8 +68,8 @@ public class AsyncTaskGetFeed implements Runnable{
                                 html.append("El post id <br><b>" + fbMessage.getId());
                                 html.append("</b><br>Contiene el siguiente texto<br><b>");
                                 html.append(fbMessage.getMessage() + "</b><br>");
-                                html.append("El post fue realizado por <b>");
-                                html.append(from.get("name").asString() + "</b><br>");
+                                //html.append("El post fue realizado por <b>");
+                                //html.append(from.get("name").asString() + "</b><br>");
                                 if(feed.get("permalink_url") != null){
                                     String permalinkUrl = feed.get("permalink_url").asString();
                                     html.append("Link del post es " + permalinkUrl + "<br>");
@@ -81,19 +81,23 @@ public class AsyncTaskGetFeed implements Runnable{
                                 }
                                 html.append("</b>");
 
-                                log.debug("From ID:" + from.get("id").asString());
+                                //log.debug("From ID:" + from.get("id").asString());
                                 log.debug("FbUser ID:" + watcher.getUsername().getUsuarioId());
+                                /*
                                 if(!from.get("id").asString()
                                         .trim()
                                         .toLowerCase()
                                         .equals(watcher.getUsername().getUsuarioId().trim().toLowerCase())){
+                                */
                                     for (Email dst : watcher.getEmails()) {
                                         String subject = subjectPrefix + fbGroup.getGroupName();
                                         sender.send(fromEmail, fromName, dst.getEmail(), dst.getDescription(), subject, html.toString());
                                     }
+                                /*
                                 }else{
                                     log.info("Admin post " + fbMessage.getId());
                                 }
+                                */
                             }
                         }
                     }

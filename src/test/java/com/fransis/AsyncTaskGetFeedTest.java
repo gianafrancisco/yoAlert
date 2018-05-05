@@ -8,10 +8,7 @@ import com.restfb.DefaultFacebookClient;
 import com.restfb.Parameter;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -62,6 +59,7 @@ public class AsyncTaskGetFeedTest {
     }
 
     @Test
+    @Ignore
     public void ignore_notified_when_admin_group() throws Exception {
 
         watcher = new Watcher();
@@ -82,6 +80,7 @@ public class AsyncTaskGetFeedTest {
     }
 
     @Test
+    @Ignore
     public void ignore_notified_when_admin_group_trim_id() throws Exception {
 
         watcher = new Watcher();

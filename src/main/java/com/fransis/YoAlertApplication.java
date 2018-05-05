@@ -23,11 +23,6 @@ import java.util.Arrays;
 @EnableAutoConfiguration
 public class YoAlertApplication {
 
-	@Value("${fb.appId}")
-	private String MY_APP_ID = "";
-	@Value("${fb.appSecret}")
-	private String MY_APP_SECRET = "";
-
 	public static void main(String[] args) {
 		SpringApplication.run(YoAlertApplication.class, args);
 	}
@@ -62,8 +57,6 @@ public class YoAlertApplication {
 					fbFilter.setWatcher(watcher);
 					fbFilter = filterRepository.saveAndFlush(fbFilter);
 				});
-
-
 
 			}
 

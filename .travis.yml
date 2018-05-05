@@ -22,7 +22,8 @@ install:
 before_install:
 #  - sudo apt-get update && sudo apt-get install -y nodejs npm
 #  - npm install -g grunt grunt-cli bower
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+#  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 after_success:
   - docker build -t fgiana/yoalert:latest .

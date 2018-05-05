@@ -21,4 +21,6 @@ cd /opt && java -Dsendinblue_key=${SENDINBLUE_KEY} \
                 -Dserver.port=8080 \
                 -Dleads_token=${LEADS_TOKEN} \
                 -DemailTo=${EMAIL_TO} \
+                -Dfb.appId=${FB_APP_ID} \
+                -Dfb.appSecret=${FB_APP_SECRET} \
                 -jar target/yoAlert-0.0.1.jar

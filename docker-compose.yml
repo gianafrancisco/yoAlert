@@ -16,6 +16,8 @@ services:
      - SENDINBLUE_KEY=
      - EMAIL_TO=gianafrancisco@gmail.com,seguros@yomeanimoyvos.com
      - LEADS_TOKEN=
+     - FB_APP_ID=
+     - FB_APP_SECRET=
     volumes:
      - /hosthome/fransis/git/mevoyseguro/site/mevoyseguro.com/:/var/www/html/
   db:

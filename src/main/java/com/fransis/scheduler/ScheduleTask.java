@@ -15,6 +15,7 @@ import com.restfb.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,9 @@ import java.util.List;
 public class ScheduleTask {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduleTask.class);
+
+    @Value("${fb.rowsLimit}")
+    private int rowsLimits = 10;
 
     @Autowired
     private FeedRepository feedRepository;
@@ -43,7 +47,7 @@ public class ScheduleTask {
     @Autowired
     private UsernameRepository usernameRepository;
 
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 60000)
     public void verificar(){
         List<Watcher> watchers = watcherRepository.findAll();
         for(Watcher watcher: watchers){
@@ -58,7 +62,7 @@ public class ScheduleTask {
                 watcher.setEmails(emailRepository.findByWatcher(watcher));
                 watcher.setFilters(filterRepository.findByWatcher(watcher));
                 DefaultFacebookClient facebookClient = new DefaultFacebookClient(watcher.getUsername().getAccessToken(), Version.VERSION_2_12);
-                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher, facebookClient);
+                AsyncTaskGetFeed asyncTaskGetFeed = new AsyncTaskGetFeed(feedRepository, sender, watcher, facebookClient, rowsLimits);
                 log.info("Verificando grupos");
                 new Thread(asyncTaskGetFeed).start();
             }

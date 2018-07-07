@@ -50,7 +50,7 @@ public class AsyncTaskGetFeedTest {
         watcher.setUsername(new FbUsername("usuario1", "ddddd", "123456789"));
 
         facebookMock = new FacebookMock("Quiero vernder mi SeGuRo", "Elver Galarga", "3333");
-        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock);
+        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock, 100);
         feed.run();
 
         Assert.assertThat(feedRepository.findAll().size(), is(1));
@@ -71,7 +71,7 @@ public class AsyncTaskGetFeedTest {
         watcher.setUsername(new FbUsername("usuario1", "ddddd", "391673694373589"));
 
         facebookMock = new FacebookMock("Quiero vernder mi SeGuRo", "Elver Galarga", "391673694373589");
-        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock);
+        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock, 100);
         feed.run();
 
         Assert.assertThat(feedRepository.findAll().size(), is(1));
@@ -92,7 +92,7 @@ public class AsyncTaskGetFeedTest {
         watcher.setUsername(new FbUsername("usuario1", "ddddd", "391673694373589"));
 
         facebookMock = new FacebookMock("Quiero vernder mi SeGuRo", "Elver Galarga", " 391673694373589");
-        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock);
+        feed = new AsyncTaskGetFeed(feedRepository, emailSender, watcher, facebookMock, 100);
         feed.run();
 
         Assert.assertThat(feedRepository.findAll().size(), is(1));

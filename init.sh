@@ -13,6 +13,10 @@ then
     DB_USERNAME="alertas"
 fi
 
+if [ -z ${ROW_LIMIT} ]
+then
+    ROW_LIMIT=10
+fi
 
 cd /opt && java -Dsendinblue_key=${SENDINBLUE_KEY} \
                 -Dspring.datasource.password=${DB_PASSWORD} \
@@ -23,4 +27,5 @@ cd /opt && java -Dsendinblue_key=${SENDINBLUE_KEY} \
                 -DemailTo=${EMAIL_TO} \
                 -Dfb.appId=${FB_APP_ID} \
                 -Dfb.appSecret=${FB_APP_SECRET} \
+                -Dfb.rowsLimit=${ROW_LIMIT} \
                 -jar target/yoAlert-0.0.1.jar

@@ -47,13 +47,15 @@ public class AsyncTaskGetFeed implements Runnable{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //log.info("Grupo " + fbGroup.getGroupName());
+                log.info("Grupo " + fbGroup.getGroupName());
                 groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,from,permalink_url"), Parameter.with("limit", rowsLimit));
                 JsonArray data = groupFeeds.get("data").asArray();
                 for (int i = 0; i < data.size(); i++) {
                     JsonObject feed = data.get(i).asObject();
                     if (feed.get("message") != null) {
                         String message = feed.get("message").asString();
+                        log.info("message id:  " + feed.get("id").asString());
+                        log.info("message data:  " + message);
                         if (!feedRepository.exists(feed.get("id").asString())) {
                             final List<FbFilter> list = new ArrayList<>();
                             boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> {
@@ -80,7 +82,7 @@ public class AsyncTaskGetFeed implements Runnable{
                                 if(feed.get("permalink_url") != null){
                                     String permalinkUrl = feed.get("permalink_url").asString();
                                     html.append("Link del post es " + permalinkUrl + "<br>");
-                                    log.debug("permalink_url " + permalinkUrl);
+                                    log.info("permalink_url " + permalinkUrl);
                                 }
                                 html.append("Las palabras encontadas son: <br><b>");
                                 for(FbFilter f: list){
@@ -89,7 +91,7 @@ public class AsyncTaskGetFeed implements Runnable{
                                 html.append("</b>");
 
                                 //log.debug("From ID:" + from.get("id").asString());
-                                log.debug("FbUser ID:" + watcher.getUsername().getUsuarioId());
+                                log.info("FbUser ID:" + watcher.getUsername().getUsuarioId());
                                 /*
                                 if(!from.get("id").asString()
                                         .trim()

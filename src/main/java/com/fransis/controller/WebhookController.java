@@ -53,7 +53,7 @@ public class WebhookController {
         else {
             emailsTo = Collections.emptyList();
         }
-        facebookClient = new DefaultFacebookClient(token, Version.VERSION_2_12);
+        facebookClient = new DefaultFacebookClient(token, Version.VERSION_3_0);
     }
 
     @RequestMapping(method = RequestMethod.POST)

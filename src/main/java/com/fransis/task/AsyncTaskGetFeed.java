@@ -47,16 +47,16 @@ public class AsyncTaskGetFeed implements Runnable{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                log.info("Grupo " + fbGroup.getGroupName());
-                groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,from,permalink_url"), Parameter.with("limit", rowsLimit));
+                //log.info("Grupo " + fbGroup.getGroupName());
+                groupFeeds = facebookClient.fetchObject("/" + fbGroup.getGroupId() + "/feed", JsonObject.class, Parameter.with("fields", "id,message,permalink_url"), Parameter.with("limit", rowsLimit));
                 JsonArray data = groupFeeds.get("data").asArray();
-                log.info("rows:  " + data.size() + "/" + rowsLimit);
+                log.info("Grupo " + fbGroup.getGroupName() + " rows:  " + data.size() + "/" + rowsLimit);
                 for (int i = 0; i < data.size(); i++) {
                     JsonObject feed = data.get(i).asObject();
                     if (feed.get("message") != null) {
                         String message = feed.get("message").asString();
-                        log.info("message id:  " + feed.get("id").asString());
-                        log.info("message data:  " + message);
+                        //log.info("message id:  " + feed.get("id").asString());
+                        //log.info("message data:  " + message);
                         if (!feedRepository.exists(feed.get("id").asString())) {
                             final List<FbFilter> list = new ArrayList<>();
                             boolean m = watcher.getFilters().stream().anyMatch(fbFilter -> {
